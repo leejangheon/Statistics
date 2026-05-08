@@ -1,0 +1,45 @@
+##Runconfig
+
+CLR_Mode=False
+dunnP=0.05
+Model=auto #kruskal|wilcox|wilcoxonSign
+
+
+
+#Path
+pipeline=/garnet2/Tools/Amplicon_MetaGenome/Adv_Analysis/Statistics_v2.0.0/pipeline/
+
+
+asv=/garnet2/Analysis/BI/AmpliconMetaGenome_ASV/
+read_based=/garnet2/Analysis/BI/ShotgunMetaGenome/
+
+
+# Script
+
+sPath=/garnet2/Tools/Amplicon_MetaGenome/Adv_Analysis/Statistics_v2.0.0/src
+
+Preprocessing=0_1_Preprocessing/main.py
+Preprocessing_Custom=0_2_Prepare/custom_formatting.py
+
+Norm=0_2_Prepare/Normality_test.py
+
+Arithmetic_Statistics=1_Arithmetic_Statistics/Arithmetic_Statistics.py
+
+Pair_Arithmetic=1_Arithmetic_Statistics/Pair_Arithmetic.py
+
+
+## Statistics
+Kruskal="2_Statistics/Kruskal_Wallis.py 99_Export/Kruskal_Wallis.py"
+Wilcoxon="2_Statistics/wilcoxon_ranksum.py 99_Export/wilcoxon_ranksum.py"
+Wilcoxon_pair="2_Statistics/wilcoxon_signed_ranksum.py 99_Export/wilcoxon_signed_ranksum.py"
+
+
+t_test="2_Statistics/t_test.py"
+paired_t="2_Statistics/paired_t_test.py"
+
+
+
+
+MakeExcel=ZZ_Report/MakeExcel.py
+
+MergeExcel=ZZ_Report/MergeExcel.py

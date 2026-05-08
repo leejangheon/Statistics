@@ -1,0 +1,14 @@
+[sheetname]
+Valiable
+[Title]
+Wilcoxon ranksum test
+[SubTitle]
+-
+[th]
+TEST	Case	Case	Case
+[th]
+TEST	TEST1	TEST2	TEST3
+[td]
+1	2	3	4
+[td]
+1	2	3	5
