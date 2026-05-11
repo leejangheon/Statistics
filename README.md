@@ -38,7 +38,10 @@
 ```bash
 # 기본 커맨드 구조
 sh /garnet2/Tools/Amplicon_MetaGenome/Adv_Analysis/Statistics_v2.0.0/run.sh [Mode] [옵션]
+```
+
 1. ASV Mode (ASV.sh)
+```
 앰플리콘 데이터 기반 통계 분석 시 사용합니다.
 필수 옵션:
 -o, --order : 분석 오더 번호
@@ -50,39 +53,57 @@ sh /garnet2/Tools/Amplicon_MetaGenome/Adv_Analysis/Statistics_v2.0.0/run.sh [Mod
 --pair : Paired 분석 시 짝 정보 컬럼명
 --adiv : Alpha Diversity 분석 여부 (True/False)
 -it : Taxonomy 레벨 (기본값: phylum,genus,species)
+```
+
+
 2. Read-based Mode (Read_based.sh)
+```
 샷건 메타지놈 데이터의 분류 및 기능 유전자 통계 분석 시 사용합니다.
 필수 옵션: -o, --order / -m, --metadata
 선택 옵션: ASV 옵션과 동일하며, 기능 유전자 레벨 설정을 위한 -if (기본값: metacyc,gene) 옵션을 추가로 지원합니다.
-3. Custom & Norm Mode
+```
+
+4. Custom & Norm Mode
+```
 Custom Mode: 사용자가 직접 준비한 파일 분석. -ic 옵션으로 입력 데이터 경로를 지정합니다.
 Norm Mode: 데이터 정규성 검사 단독 수행. Normality 폴더에 결과가 생성됩니다.
+```
 
 --------------------------------------------------------------------------------
 💻 사용 예시 (Use Cases)
 📌 ASV 분석
 # 1. 기본 실행 (Group 컬럼 기준, Kruskal-Wallis, 기본 Level 분석)
+```
 sh .../run.sh ASV --order HN00sample --metadata metadata.statistics.txt --analysis analysis_15ea --method Kruskal
-
+```
 # 2. Paired 분석 실행 (Pair 컬럼 추가 필수)
+```
 sh .../run.sh ASV --order HN00sample --header Group --pair Pair --metadata metadata_pair.txt --analysis analysis_135ea_BLAST --method Wilcoxon_pair
-
+```
 # 3. 분석 레벨 커스텀 (Family 추가) 및 Alpha Diversity 제외
+```
 sh .../run.sh ASV --order HN00sample --metadata metadata.statistics.txt --analysis analysis_15ea -it phylum,family,genus,species --adiv False
 (주의: ASV 진행 시 Taxonomy assignment 결과가 두 개 이상이면 스크립트 실행 중 선택 창이 출력됩니다.)
+```
+
 📌 Read-based 분석
 # 1. 기본 실행
+```
 sh .../run.sh ReadBased --order HN0KITTEST --metadata metadata.txt
-
+```
 # 2. Functional 항목에 KEGG, EGGNOG 추가
+```
 sh .../run.sh ReadBased --order HN0KITTEST --metadata metadata.txt -if metacyc,gene,kegg,eggnog
+```
 📌 Custom 데이터 및 정규성 검사
 # 1. Custom 다중 파일 분석
+```
 sh .../run.sh Custom -ic abundance.txt,abundance2.txt --order HN00274906 --metadata metadata.txt
-
+```
 # 2. 정규성(Normality) 검사 단독 실행
+```
 sh .../pipeline/Norm.sh -ic abundance.txt -m metadata.txt
-
+```
 --------------------------------------------------------------------------------
 📂 결과 파일 구조
 분석이 완료되면 설정한 디렉토리(기본값: [analysis]_Statistics)에 다음과 같은 결과가 생성됩니다.
