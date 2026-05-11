@@ -7,54 +7,61 @@ from statsmodels.stats.multitest import multipletests
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 import sys
 
+from itertools import combinations
 
-def eta_squared(groups):
-    all_values = np.concatenate(groups)
-    grand_mean = np.mean(all_values)
+table = pd.read_csv(
+    sys.argv[1],
+    sep="\t",
+    index_col=0
+).T
 
-    ss_between = sum([
-        len(g) * (np.mean(g) - grand_mean) ** 2 for g in groups
-    ])
+metadata = pd.read_csv(
+    sys.argv[2],
+    sep="\t",
+    index_col=0,
+    dtype=str
+)
 
-    ss_total = sum([
-        (x - grand_mean) ** 2 for x in all_values
-    ])
+table.index = table.index.astype(str)
+metadata.index = metadata.index.astype(str)
 
-    return ss_between / ss_total if ss_total != 0 else np.nan
-
-
-table = pd.read_csv(sys.argv[1], sep="\t", index_col=0)
-metadata = pd.read_csv(sys.argv[2], sep="\t", index_col=0)
-
-# align
 table = table.loc[metadata.index]
 
 group_col = metadata.columns[0]
+
 groups = metadata[group_col]
+
+groups_ = metadata[group_col].astype(str).unique().tolist()
+
+pairs = list(combinations(groups_, 2))
 
 results = []
 
-for taxa in table.columns:
+total_taxa = len(table.columns)
+
+for idx, taxa in enumerate(table.columns, start=1):
 
     df = pd.DataFrame({
-        "value": table[taxa],
+        "value": pd.to_numeric(
+            table[taxa],
+            errors="coerce"
+        ),
         "group": groups
-    })
+    }).dropna()
 
-    grouped = df.groupby("group")
-    group_values = [g["value"].values for _, g in grouped]
+    # group별 값 추출
+    group_values = [
+        g["value"].values
+        for _, g in df.groupby("group")
+    ]
 
-    # ANOVA
+    # One-way ANOVA
     stat, p = f_oneway(*group_values)
-
-    # effect size
-    eta2 = eta_squared(group_values)
 
     row = {
         "taxa": taxa,
         "anova_F": stat,
-        "anova_p": p,
-        "anova_eta2": eta2
+        "anova_p": p
     }
 
     # Tukey HSD
@@ -69,36 +76,73 @@ for taxa in table.columns:
         columns=tukey._results_table.data[0]
     )
 
-    for _, r in tukey_df.iterrows():
-        g1 = str(r["group1"])
-        g2 = str(r["group2"])
-        key = f"tukey_{g1}_vs_{g2}"
+    # pair 결과 저장
+    for g1, g2 in pairs:
 
-        row[f"{key}_meandiff"] = r["meandiff"]
-        row[f"{key}_p"] = r["p-adj"]
-        row[f"{key}_reject"] = r["reject"]
+        match = tukey_df[
+            (
+                (tukey_df["group1"] == g1)
+                & (tukey_df["group2"] == g2)
+            )
+            |
+            (
+                (tukey_df["group1"] == g2)
+                & (tukey_df["group2"] == g1)
+            )
+        ]
+
+        if len(match) > 0:
+
+            row[f"tukey_{g1}_vs_{g2}"] = (
+                match["p-adj"].values[0]
+            )
+
+            row[f"tukey_{g1}_vs_{g2}_reject"] = (
+                match["reject"].values[0]
+            )
+
+        else:
+
+            row[f"tukey_{g1}_vs_{g2}"] = np.nan
+
+            row[f"tukey_{g1}_vs_{g2}_reject"] = np.nan
 
     results.append(row)
 
+    progress = (idx / total_taxa) * 100
+
+    print(
+        f"\rStatistics Processing: "
+        f"{idx}/{total_taxa} "
+        f"({progress:.2f}%)",
+        end="",
+        flush=True
+    )
+
+print("\nDone")
+
 result_df = pd.DataFrame(results)
 
-
-# ANOVA FDR correction
+# ANOVA 1st FDR correction
 result_df["anova_fdr"] = multipletests(
     result_df["anova_p"],
     method="fdr_bh"
 )[1]
 
-
-# 2nd FDR
+# ANOVA 2nd FDR correction
 sig = result_df["anova_p"] < 0.05
+
 result_df["anova_fdr_2nd"] = "."
 
 if sig.sum() > 0:
+
     result_df.loc[sig, "anova_fdr_2nd"] = multipletests(
         result_df.loc[sig, "anova_p"],
         method="fdr_bh"
     )[1]
 
-
-result_df.to_csv("anova_tukey_summary.tsv", sep="\t", index=False)
+result_df.to_csv(
+    "anova_tukey_summary.tsv",
+    sep="\t",
+    index=False
+)

@@ -96,6 +96,19 @@ if args.desc and os.path.exists(args.desc):
             final_cols = ["label", "description"]
             styles=["ws.column_dimensions[get_column_letter(1)].width = 25","ws.column_dimensions[get_column_letter(2)].width = 30"]
             
+    elif args.type =="adiv":
+    
+        # desc랑 label이 모두 동일하면 label만 작성
+        all_match = (desc["label"] == desc["description"]).all()
+        if (all_match):
+            final_cols = ["label"]
+            styles=["ws.column_dimensions[get_column_letter(1)].width = 25"]
+    
+        else:
+            df = df.merge(desc, on="label", how="left")
+            final_cols = ["label", "description"]
+            styles=["ws.column_dimensions[get_column_letter(1)].width = 25","ws.column_dimensions[get_column_letter(2)].width = 30"]
+
     elif args.type =="ic":
     
         # desc랑 label이 모두 동일하면 label만 작성

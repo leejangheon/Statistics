@@ -26,7 +26,7 @@ def hodges_lehmann_ci(x, y, alpha=0.05):
 
     return hl, lower, upper
 
-def wilcox_ci(x, y, alpha=0.05, grid_size=400):
+def wilcox_ci(x, y, alpha=0.05, grid_size=50):
 
     x = np.asarray(x)
     y = np.asarray(y)
@@ -35,7 +35,7 @@ def wilcox_ci(x, y, alpha=0.05, grid_size=400):
     x = x[~np.isnan(x)]
     y = y[~np.isnan(y)]
 
-    # Hodges–Lehmann estimator (R 동일 개념)
+    # Hodges–Lehmann estimato
     diffs = np.subtract.outer(y, x).ravel()
     hl = np.median(diffs)
 
@@ -79,7 +79,9 @@ g1, g2 = unique_groups
 results = []
 pvals = []
 
-for taxa in table.columns:
+total_taxa = len(table.columns)
+
+for idx, taxa in enumerate(table.columns, start=1):
 
     df = pd.DataFrame({
         "value": table[taxa],
@@ -105,6 +107,13 @@ for taxa in table.columns:
 
     results.append(row)
     pvals.append(p)
+    progress = (idx / total_taxa) * 100
+    print(
+        f"\rStatistics Processing: {idx}/{total_taxa} "
+        f"({progress:.2f}%)",
+        end="",
+        flush=True
+    )
 
 result_df = pd.DataFrame(results)
 

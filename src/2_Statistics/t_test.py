@@ -7,46 +7,55 @@ from statsmodels.stats.multitest import multipletests
 import sys
 
 
-def cohens_d(x, y):
-    nx = len(x)
-    ny = len(y)
-    dof = nx + ny - 2
+def mean_ci(v1, v2, alpha=0.05):
 
-    pooled_std = np.sqrt(
-        ((nx - 1) * np.var(x, ddof=1) + (ny - 1) * np.var(y, ddof=1)) / dof
-    )
+    v1 = np.asarray(v1, dtype=float)
+    v2 = np.asarray(v2, dtype=float)
 
-    return (np.mean(y) - np.mean(x)) / pooled_std
+    v1 = v1[~np.isnan(v1)]
+    v2 = v2[~np.isnan(v2)]
 
+    mean_diff = np.mean(v2) - np.mean(v1)
 
-def mean_diff_ci(x, y, alpha=0.05):
-    nx = len(x)
-    ny = len(y)
+    n1 = len(v1)
+    n2 = len(v2)
 
-    mean_diff = np.mean(y) - np.mean(x)
+    s1 = np.var(v1, ddof=1)
+    s2 = np.var(v2, ddof=1)
 
-    var_x = np.var(x, ddof=1)
-    var_y = np.var(y, ddof=1)
+    
+    se = np.sqrt((s1 / n1) + (s2 / n2))
 
-    se = np.sqrt(var_x / nx + var_y / ny)
-
-    # Welch-Satterthwaite df
-    df = (var_x / nx + var_y / ny) ** 2 / (
-        (var_x**2) / (nx**2 * (nx - 1)) +
-        (var_y**2) / (ny**2 * (ny - 1))
+    
+    df = (
+        ((s1 / n1) + (s2 / n2)) ** 2
+    ) / (
+        ((s1 / n1) ** 2) / (n1 - 1)
+        + ((s2 / n2) ** 2) / (n2 - 1)
     )
 
     from scipy.stats import t
+
     t_crit = t.ppf(1 - alpha / 2, df)
 
-    lower = mean_diff - t_crit * se
-    upper = mean_diff + t_crit * se
+    ci_low = mean_diff - (t_crit * se)
+    ci_high = mean_diff + (t_crit * se)
 
-    return mean_diff, lower, upper
+    return ci_low, ci_high
 
 
-table = pd.read_csv(sys.argv[1], sep="\t", index_col=0)
-metadata = pd.read_csv(sys.argv[2], sep="\t", index_col=0)
+table = pd.read_csv(
+    sys.argv[1],
+    sep="\t",
+    index_col=0
+).T
+
+metadata = pd.read_csv(
+    sys.argv[2],
+    sep="\t",
+    index_col=0,
+    dtype=str
+)
 
 # align
 table = table.loc[metadata.index]
@@ -54,46 +63,70 @@ table = table.loc[metadata.index]
 group_col = metadata.columns[0]
 groups = metadata[group_col]
 
-unique_groups = groups.unique()
+unique_groups = groups.astype(str).unique()
+
 if len(unique_groups) != 2:
-    raise ValueError(f"Expected exactly 2 groups, but got {len(unique_groups)}")
+    raise ValueError(
+        f"Expected exactly 2 groups, but got {len(unique_groups)}"
+    )
 
 g1, g2 = unique_groups
 
 results = []
 pvals = []
 
-for taxa in table.columns:
+total_taxa = len(table.columns)
+
+for idx, taxa in enumerate(table.columns, start=1):
 
     df = pd.DataFrame({
         "value": table[taxa],
         "group": groups
     })
 
-    v1 = df[df["group"] == g1]["value"].values
-    v2 = df[df["group"] == g2]["value"].values
+    v1 = pd.to_numeric(
+        df[df["group"] == g1]["value"],
+        errors="coerce"
+    ).dropna().values
+
+    v2 = pd.to_numeric(
+        df[df["group"] == g2]["value"],
+        errors="coerce"
+    ).dropna().values
 
     # Welch t-test
-    stat, p = ttest_ind(v1, v2, equal_var=False)
+    stat, p = ttest_ind(
+        v1,
+        v2,
+        equal_var=False,
+        nan_policy="omit"
+    )
 
-    # mean difference + CI
-    mean_diff, ci_low, ci_high = mean_diff_ci(v1, v2)
-
-    # effect size
-    d = cohens_d(v1, v2)
+    # mean difference + 95% CI
+    #mean_diff, ci_low, ci_high = mean_ci(v1, v2)
 
     row = {
         "taxa": taxa,
-        "ttest.statistic": stat,
         "ttest.pvalue": p,
-        "ttest.mean_diff": mean_diff,
+        #"ttest.mean_diff": mean_diff,
         "ttest.CI_low": ci_low,
-        "ttest.CI_high": ci_high,
-        "ttest.cohens_d": d
+        "ttest.CI_high": ci_high
     }
 
     results.append(row)
     pvals.append(p)
+
+    progress = (idx / total_taxa) * 100
+
+    print(
+        f"\rStatistics Processing: "
+        f"{idx}/{total_taxa} "
+        f"({progress:.2f}%)",
+        end="",
+        flush=True
+    )
+
+print("\nDone")
 
 result_df = pd.DataFrame(results)
 
@@ -103,14 +136,20 @@ result_df["ttest.fdr"] = multipletests(
     method="fdr_bh"
 )[1]
 
-
+# second FDR
 sig = result_df["ttest.pvalue"] < 0.05
+
 result_df["ttest.fdr_2nd"] = "."
 
 if sig.sum() > 0:
+
     result_df.loc[sig, "ttest.fdr_2nd"] = multipletests(
         result_df.loc[sig, "ttest.pvalue"],
         method="fdr_bh"
     )[1]
 
-result_df.to_csv("ttest_summary.tsv", sep="\t", index=False)
+result_df.to_csv(
+    "ttest_summary.tsv",
+    sep="\t",
+    index=False
+)

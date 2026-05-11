@@ -36,7 +36,7 @@ Wilcoxon_pair="2_Statistics/wilcoxon_signed_ranksum.py 99_Export/wilcoxon_signed
 
 t_test="2_Statistics/t_test.py"
 paired_t="2_Statistics/paired_t_test.py"
-
+anova="2_Statistics/1way_annova.py 99_Export/1way_annova.py"
 
 
 

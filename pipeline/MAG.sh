@@ -99,6 +99,52 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+[[ -z "$orderNumber" ]] && {
+    echo "[ERROR] orderNumber is required option in Read Based pipeline"
+    exit 1
+}
+
+
+
+[[ -z "$metadata" ]] && {
+    echo "[ERROR] metadata is required option in Read Based pipeline"
+    exit 1
+}
+
+
+echo ""
+echo "=================================================="
+echo "      Read based Statistics Pipeline Config"
+echo "=================================================="
+
+printf "%-20s : %s\n" "orderNumber" "$orderNumber"
+printf "%-20s : %s\n" "metadata" "$metadata"
+
+echo "--------------------------------------------------"
+
+printf "%-20s : %s\n" "header" "$header"
+printf "%-20s : %s\n" "method" "$method"
+printf "%-20s : %s\n" "adiv" "$adiv"
+printf "%-20s : %s\n" "tax_level" "$tax_level"
+printf "%-20s : %s\n" "func_level" "$func_level"
+printf "%-20s : %s\n" "pair_boolen" "$pair_boolen"
+
+if [[ "$pair_boolen" == "True" ]]; then
+    printf "%-20s : %s\n" "pair_header" "$pair"
+fi
+
+if [[ "$method" == "Kruskal" ]]; then
+    printf "%-20s : %s\n" "dunnP" "$dunnP"
+fi
+
+echo "--------------------------------------------------"
+
+printf "%-20s : %s\n" "output_name" "$output_name"
+
+echo "=================================================="
+echo ""
+
+sleep 5
 ## setting Dir / params
 source $config
 
@@ -157,7 +203,7 @@ function run_statistics(){
     echo "cut -f1,${num_header} ${metadata} > ${o_paht}/${output}/metadata.txt"
     echo "cp ${input} ${o_paht}/${output}/"
     echo "cd ${o_paht}/${output}"
-    echo "${sPath}/${Preprocessing} -t asv -m ./metadata.txt  -${type} ${input}  --output ./"
+    echo "${sPath}/${Preprocessing} -t read-based -m ./metadata.txt  -${type} ${input}  --output ./"
 
     #Step2. Arithmetic_Statistics
     echo "${sPath}/${Arithmetic_Statistics}  processed.txt  ./metadata.txt "
@@ -180,7 +226,7 @@ function run_statistics(){
     cut -f1,${num_header} ${metadata} > ${o_paht}/${output}/metadata.txt
     cp ${input} ${o_paht}/${output}/
     cd ${o_paht}/${output}
-    ${sPath}/${Preprocessing} -t asv -m ./metadata.txt  -${type} ${input}  --output ./
+    ${sPath}/${Preprocessing} -t read-based -m ./metadata.txt  -${type} ${input}  --output ./
   
     #Step2. Arithmetic_Statistics
     ${sPath}/${Arithmetic_Statistics}  processed.txt  ./metadata.txt 
@@ -202,7 +248,7 @@ function run_statistics(){
 lists=()
 merged_sheet=()
 
-if [ -n "$adiv" ]; then
+if [[ "${adiv,,}" == "true" ]]; then
     lists+=("adiv,${read_based}/${orderNumber}/result/MetaPhlAn4/${orderNumber}_MetaPhlAn4_adiv.tsv,AlphaDiversity")
     merged_sheet+=("${p_result}/AlphaDiversity")
 fi
@@ -217,39 +263,39 @@ fi
 #MetaPhlAn4.Order.tsv   
 #MetaPhlAn4.Phylum.tsv  
 #MetaPhlAn4.Species.tsv 
-if [ -n "$tax_level" ]; then
+if [[ "${tax_level,,}" != "false" ]]; then
     IFS=',' read -ra vals <<< "$tax_level"
     for v in "${vals[@]}"; do
 
         case "$v" in
             phylum)
-                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Phylum.txt,Phylum")
+                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Phylum.tsv,Phylum")
                 merged_sheet+=("${p_result}/Phylum")
                 ;;
 
 
             class)
-                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Class.txt,Class")
+                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Class.tsv,Class")
                 merged_sheet+=("${p_result}/Class")
                 ;;
 
             order)
-                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Order.txt,Order")
+                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Order.tsv,Order")
                 merged_sheet+=("${p_result}/Order")
                 ;;
 
             family)
-                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Family.txt,Family")
+                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Family.tsv,Family")
                 merged_sheet+=("${p_result}/Family")
                 ;;
 
             genus)
-                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Genus.txt,Genus")
+                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Genus.tsv,Genus")
                 merged_sheet+=("${p_result}/Genus")
                 ;;
 
             species)
-                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Species.txt,Species")
+                lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Species.tsv,Species")
                 merged_sheet+=("${p_result}/Species")
                 ;;
 
@@ -260,29 +306,29 @@ fi
 #func_level="metacyc,kegg,eggnog,gene"
 #/garnet2/Analysis/BI/ShotgunMetaGenome/HN00270465/result/HUMAnN4/regroup/HN00270465_uniref90_eggnog_eggnog.tsv
 #/garnet2/Analysis/BI/ShotgunMetaGenome/HN00270465/result/HUMAnN4/regroup/HN00270465_uniref90_ko_kegg-orthology.tsv
-if [ -n "$func_level" ]; then
+if [[ "${func_level,,}" != "false" ]]; then
     IFS=',' read -ra vals <<< "$func_level"
     for v in "${vals[@]}"; do
 
         case "$v" in
             metacyc)
-                lists+=("it,${read_based}/${orderNumber}/result/HUMAnN4//${orderNumber}_pathabundance.tsv,MetaCyc")
+                lists+=("if,${read_based}/${orderNumber}/result/HUMAnN4//${orderNumber}_pathabundance.tsv,MetaCyc")
                 merged_sheet+=("${p_result}/MetaCyc")
                 ;;
 
 
             kegg)
-                lists+=("it,${read_based}/${orderNumber}/result/HUMAnN4/regroup//${orderNumber}_uniref90_ko_kegg-orthology.tsv,KEGG")
+                lists+=("if,${read_based}/${orderNumber}/result/HUMAnN4/regroup//${orderNumber}_uniref90_ko_kegg-orthology.tsv,KEGG")
                 merged_sheet+=("${p_result}/KEGG")
                 ;;
 
             eggnog)
-                lists+=("it,${read_based}/${orderNumber}/result/HUMAnN4/regroup//${orderNumber}_uniref90_eggnog_eggnog.tsv,EggNOG")
+                lists+=("if,${read_based}/${orderNumber}/result/HUMAnN4/regroup//${orderNumber}_uniref90_eggnog_eggnog.tsv,EggNOG")
                 merged_sheet+=("${p_result}/EggNOG")
                 ;;
 
             gene)
-                lists+=("it,${read_based}/${orderNumber}/result/HUMAnN4//${orderNumber}_genefamilies.tsv,Gene")
+                lists+=("if,${read_based}/${orderNumber}/result/HUMAnN4//${orderNumber}_genefamilies.tsv,Gene")
                 merged_sheet+=("${p_result}/Gene")
                 ;;
 

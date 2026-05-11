@@ -113,6 +113,21 @@ done
     exit 1
 }
 
+## setting Dir / params
+source $config
+
+P_oPath=$asv/$orderNumber/
+p_result=$P_oPath/${analysis}_${output_name}
+
+
+if [ -d "$p_result" ]; then
+    echo "[ERROR] Directory already exists: $p_result" >&2
+    exit 1
+fi
+
+mkdir -p ${p_result}
+
+{
 echo ""
 echo "=================================================="
 echo "         ASV Statistics Pipeline Config"
@@ -144,22 +159,8 @@ printf "%-20s : %s\n" "output_name" "$output_name"
 
 echo "=================================================="
 echo ""
-
+} | tee ${p_result}/config
 sleep 5
-## setting Dir / params
-source $config
-
-P_oPath=$asv/$orderNumber/
-p_result=$P_oPath/${analysis}_${output_name}
-
-
-if [ -d "$p_result" ]; then
-    echo "[ERROR] Directory already exists: $p_result" >&2
-    exit 1
-fi
-
-mkdir -p ${p_result}
-
 
 # 프롬프트 : taxnonmy tool이 여러개인경우 선택하도록 
 base="${asv}/${orderNumber}/${analysis}/Taxonomy_Assignment"
@@ -276,7 +277,7 @@ function run_statistics(){
 lists=()
 merged_sheet=()
 
-if [ -n "$adiv" ]; then
+if [[ "${adiv,,}" == "true" ]]; then
     lists+=("adiv,${asv}/${orderNumber}/${analysis}/Diversity/alpha_diversity_6.txt,AlphaDiversity")
     merged_sheet+=("${p_result}/AlphaDiversity")
 fi
@@ -284,7 +285,7 @@ fi
 
 ## taxonomy
 #${asv}/${orderNumber}/${analysis}/Taxonomy_Assignment/Bayesian_NCBI_16S/ASVs_Bayesian_NCBI_16S.biom.summary   ASVs_Bayesian_NCBI_16S_L2.txt
-if [ -n "$tax_level" ]; then
+if [[ "${tax_level,,}" != "false" ]]; then
     IFS=',' read -ra vals <<< "$tax_level"
     for v in "${vals[@]}"; do
 

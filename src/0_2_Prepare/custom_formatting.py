@@ -3,17 +3,6 @@ import pandas as pd
 import numpy as np
 import argparse
 
-# 단계설정 
-# 1. metadata load
-# 2. input load
-# 3. colname, rowname - SampleID  매칭 개수 체크 
-# 4. count result 비교 
-  # 0,0  --> fail
-  # col > row  -->  transpose
-  # row > col --> continue 
-# 5. 일치하는 샘플만 남기기 
-# 6. CLR trans check
-# 7. write table.tsv
 
 def clr_transform(df, pseudocount):
     df = df + pseudocount

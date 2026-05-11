@@ -30,8 +30,9 @@ g1, g2 = unique_groups
 
 results = []
 pvals = []
+total_taxa = len(table.columns)
 
-for taxa in table.columns:
+for idx, taxa in enumerate(table.columns, start=1):
 
     df = pd.DataFrame({
         "value": table[taxa],
@@ -82,7 +83,13 @@ for taxa in table.columns:
 
     results.append(row)
     pvals.append(p)
-
+    progress = (idx / total_taxa) * 100
+    print(
+        f"\rStatistics Processing: {idx}/{total_taxa} "
+        f"({progress:.2f}%)",
+        end="",
+        flush=True
+    )
 result_df = pd.DataFrame(results)
 
 

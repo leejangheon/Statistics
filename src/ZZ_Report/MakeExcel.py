@@ -329,7 +329,8 @@ if __name__ == "__main__":
         templateFile = os.path.join(script_dir, "template", "WilcoxonSignedRank_Statistics_Result.xlsx")
     
 
-    
+    else:
+        templateFile = os.path.join(script_dir, "template", "Empty.xlsx")
     wb = load_workbook(templateFile)
     front_page(wb,orderNumber,metadata,method,dirs)
 

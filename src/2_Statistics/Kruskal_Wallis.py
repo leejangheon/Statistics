@@ -23,8 +23,9 @@ groups_ = metadata[group_col].astype(str).unique().tolist()
 pairs = list(combinations(groups, 2))
 results = []
 
+total_taxa = len(table.columns)
 
-for taxa in table.columns:
+for idx, taxa in enumerate(table.columns, start=1):
 
     df = pd.DataFrame({
         "value": table[taxa],
@@ -59,7 +60,13 @@ for taxa in table.columns:
         row[f"dunn_{g1}_vs_{g2}_fdr"] = dunn_adj.loc[g1, g2]
  
     results.append(row)
-
+    progress = (idx / total_taxa) * 100
+    print(
+        f"\rStatistics Processing: {idx}/{total_taxa} "
+        f"({progress:.2f}%)",
+        end="",
+        flush=True
+    )
 result_df = pd.DataFrame(results)
 
 

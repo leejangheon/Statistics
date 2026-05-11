@@ -102,6 +102,22 @@ done
     exit 1
 }
 
+
+
+## setting Dir / params
+source $config
+
+p_result=./${output_name}
+
+
+if [ -d "$p_result" ]; then
+    echo "[ERROR] Directory already exists: $p_result" >&2
+    exit 1
+fi
+
+mkdir -p ${p_result}
+
+{
 echo ""
 echo "=================================================="
 echo "         ASV Statistics Pipeline Config"
@@ -131,20 +147,8 @@ printf "%-20s : %s\n" "output_name" "$output_name"
 
 echo "=================================================="
 echo ""
-
-
-## setting Dir / params
-source $config
-
-p_result=./${output_name}
-
-
-if [ -d "$p_result" ]; then
-    echo "[ERROR] Directory already exists: $p_result" >&2
-    exit 1
-fi
-
-mkdir -p ${p_result}
+} | tee ${p_result}/config
+sleep 5 
 
 
 
