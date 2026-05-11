@@ -57,7 +57,7 @@ anova_cols = [
 for g1, g2 in pairs:
 
     anova_cols.append(f"tukey_{g1}_vs_{g2}")
-    anova_cols.append(f"tukey_{g1}_vs_{g2}_reject")
+    #anova_cols.append(f"tukey_{g1}_vs_{g2}_reject")
 
 anova_rename = {
     "anova_F": "ANOVA_F",
@@ -72,9 +72,9 @@ for g1, g2 in pairs:
         f"tukey_{g1}_vs_{g2}"
     ] = f"{g1}_vs_{g2}.tukeyp"
 
-    anova_rename[
-        f"tukey_{g1}_vs_{g2}_reject"
-    ] = f"{g1}_vs_{g2}.reject"
+    #anova_rename[
+    #    f"tukey_{g1}_vs_{g2}_reject"
+    #] = f"{g1}_vs_{g2}.reject"
 
 anova2 = anova[
     anova_cols
@@ -93,13 +93,13 @@ if args.dunn is not None:
 
         tukey_col = f"{g1}_vs_{g2}.tukeyp"
 
-        reject_col = f"{g1}_vs_{g2}.reject"
+        #reject_col = f"{g1}_vs_{g2}.reject"
 
         mask = df[anova_col] <= args.dunn
 
         df[tukey_col] = df[tukey_col].where(mask, ".")
 
-        df[reject_col] = df[reject_col].where(mask, ".")
+        #df[reject_col] = df[reject_col].where(mask, ".")
 
 ## description 존재시 추가
 if args.desc and os.path.exists(args.desc):
@@ -184,7 +184,7 @@ final_cols += [
 for g1, g2 in pairs:
 
     final_cols.append(f"{g1}_vs_{g2}.tukeyp")
-    final_cols.append(f"{g1}_vs_{g2}.reject")
+   # final_cols.append(f"{g1}_vs_{g2}.reject")
 
 df = df[final_cols]
 
@@ -224,12 +224,12 @@ for i, col in enumerate(df.columns):
 
         pcol.append(i)
 
-    elif ".reject" in col:
-
-        new_cols.append((
-            "Tukey HSD post hoc analysis",
-            col.replace(".reject", ".reject")
-        ))
+    #elif ".reject" in col:
+#
+        #new_cols.append((
+            #"Tukey HSD post hoc analysis",
+            #col.replace(".reject", ".reject")
+        #))
 
     elif "___" in col:
 

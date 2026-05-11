@@ -3,14 +3,75 @@
 # 2026.04.29 요약 :  ASV -> 정규성 검사 X 
 
 ## 사용방법 
-function help(){
-    echo -e "sh $0  ASV|ReadBased|Custom"
-    echo -e " Kruskal | Wilcoxon | Wilcoxon_pair | anova | t_test | paired_t_test "
+function help() {
 
-    echo -e "\n\nTEST"
+    echo ""
+    echo "======================================================================"
+    echo "                  Custom Statistical Analysis Pipeline"
+    echo "======================================================================"
+    echo ""
+
+    echo "Usage:"
+    echo "  sh $0 [OPTIONS]"
+    echo ""
+
+    echo "Required Options:"
+    echo "  -o,  --order        Order number"
+    echo "  -m,  --metadata     Metadata file"
+    echo "  -ic                 Input custom table"
+    echo ""
+
+    echo "Optional Options:"
+    echo "  --method            Statistical method"
+    echo "                      Default : Kruskal"
+    echo ""
+    echo "                      Available:"
+    echo "                        Kruskal"
+    echo "                        Wilcoxon"
+    echo "                        Wilcoxon_pair"
+    echo "                        t_test"
+    echo "                        paired_t"
+    echo "                        anova"
+    echo ""
+
+    echo "  --header            Metadata group column name"
+    echo "                      Default : Group"
+    echo ""
+
+    echo "  -d, --desc          Description for analysis"
+    echo ""
+
+    echo "  --pair              Pair column name for paired test"
+    echo "                      Example : Pair"
+    echo ""
+
+    echo "  --clr               Apply CLR normalization"
+    echo "                      Default : False"
+    echo ""
+
+    echo "  --dunnP             Dunn posthoc significance cutoff"
+    echo "                      Default : 0.05"
+    echo ""
+
+    echo "  --output            Output directory name"
+    echo "                      Default : Statistics"
+    echo ""
+
+    echo "  -c, --config        Config directory"
+    echo "                      Default :"
+    echo "                      /garnet2/Tools/Amplicon_MetaGenome/Adv_Analysis/Statistics_v2.0.0/config"
+    echo ""
+
+    echo "Unavailable Options in Custom mode:"
+    echo "  -it                 Taxonomy level option is not supported"
+    echo "  -if                 Functional level option is not supported"
+  
+
+    echo "======================================================================"
+    echo ""
+
+    exit 1
 }
-
-
 
 input=""
 metadata=""
@@ -71,10 +132,12 @@ while [ $# -gt 0 ]; do
             ;;
         -it)
             echo "invalid option it: $1"
+            help
             exit 1 ### Custom 에는 function 없음
             ;;
         -if)
             echo "invalid option if: $1"
+            help
             exit 1 ### Custom 에는 function 없음
             ;;
 
@@ -84,6 +147,8 @@ while [ $# -gt 0 ]; do
             ;;
         *)
             echo "Unknown option: $1"
+
+            help
             exit 1
             ;;
     esac
@@ -93,16 +158,27 @@ done
 ## 필수 옵션체크하기 !!! 
 [[ -z "$orderNumber" ]] && {
     echo "[ERROR] orderNumber is required option in ASV pipeline"
+    echo
+    help
     exit 1
 }
 
 
 [[ -z "$metadata" ]] && {
     echo "[ERROR] metadata is required option in ASV pipeline"
+     echo
+    help
     exit 1
 }
 
 
+if [[ ! " Kruskal Wilcoxon Wilcoxon_pair t_test paired_t anova " =~ " ${method} " ]]; then
+
+    echo "[ERROR] Invalid method: $method"
+    help
+    exit 1
+
+fi
 
 ## setting Dir / params
 source $config
@@ -197,7 +273,7 @@ function run_statistics(){
     read -ra script_arr <<< "$scripts"
     echo "${sPath}/${script_arr[0]}  processed.txt  ./metadata.txt "
     echo "${sPath}/${script_arr[1]} --dunn  ${dunnP} --desc mapping.txt --sheet ${output} --header $header --type ${type}"
-
+    echo " ${sPath}/${MakePlot}   ${method} "
 
     #for running
 
@@ -218,7 +294,8 @@ function run_statistics(){
     #Step3.  Statistics
     ${sPath}/${script_arr[0]}  processed.txt  ./metadata.txt 
     ${sPath}/${script_arr[1]} --dunn  ${dunnP} --desc mapping.txt --sheet ${output} --header $header --type ${type}
-
+    
+    ${sPath}/${MakePlot}   ${method} 
     cd -
 }
 

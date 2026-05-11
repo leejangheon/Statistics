@@ -97,15 +97,15 @@ for idx, taxa in enumerate(table.columns, start=1):
                 match["p-adj"].values[0]
             )
 
-            row[f"tukey_{g1}_vs_{g2}_reject"] = (
-                match["reject"].values[0]
-            )
+            #row[f"tukey_{g1}_vs_{g2}_reject"] = (
+            #    match["reject"].values[0]
+            #)
 
         else:
 
             row[f"tukey_{g1}_vs_{g2}"] = np.nan
 
-            row[f"tukey_{g1}_vs_{g2}_reject"] = np.nan
+           # row[f"tukey_{g1}_vs_{g2}_reject"] = np.nan
 
     results.append(row)
 

@@ -329,6 +329,15 @@ if __name__ == "__main__":
         templateFile = os.path.join(script_dir, "template", "WilcoxonSignedRank_Statistics_Result.xlsx")
     
 
+    elif method == "t_test":
+        templateFile = os.path.join(script_dir, "template", "t_test_Result.xlsx")
+
+    elif method == "paired_t":
+        templateFile = os.path.join(script_dir, "template", "Paired_t_test_Result.xlsx")
+
+    elif method == "anova":
+        templateFile = os.path.join(script_dir, "template", "ANOVA_Result.xlsx")
+   
     else:
         templateFile = os.path.join(script_dir, "template", "Empty.xlsx")
     wb = load_workbook(templateFile)

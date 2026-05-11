@@ -3,15 +3,80 @@
 # 2026.04.29 요약 :  ASV -> 정규성 검사 X 
 
 ## 사용방법 
-function help(){
-    echo -e "sh $0  ASV|ReadBased|Custom"
-    echo -e " Kruskal | Wilcoxon | Wilcoxon_pair | anova | t_test | paired_t_test "
-    echo -e "tax_level  = phylum,genus,species"
-    echo -e "func_level = metacyc,kegg,eggnog,gene"
-    echo -e "\n\nTEST"
+function help() {
+
+    echo ""
+    echo "======================================================================"
+    echo "                 Read-Based Statistical Analysis Pipeline"
+    echo "======================================================================"
+    echo ""
+
+    echo "Usage:"
+    echo "  sh $0 [OPTIONS]"
+    echo ""
+
+    echo "Required Options:"
+    echo "  -o,  --order        Order number"
+    echo "  -m,  --metadata     Metadata file"
+    echo ""
+
+    echo "Optional Options:"
+    echo "  --method            Statistical method"
+    echo "                      Default : Kruskal"
+    echo ""
+    echo "                      Available:"
+    echo "                        Kruskal"
+    echo "                        Wilcoxon"
+    echo "                        Wilcoxon_pair"
+    echo "                        t_test"
+    echo "                        paired_t"
+    echo "                        anova"
+    echo ""
+
+    echo "  --header            Metadata group column name"
+    echo "                      Default : Group"
+    echo ""
+
+    echo "  --pair              Pair column name for paired test"
+    echo "                      Example : Pair"
+    echo ""
+
+    echo "  --adiv              Run alpha diversity analysis"
+    echo "                      Default : True"
+    echo ""
+
+
+    echo "  --dunnP             Dunn posthoc significance cutoff"
+    echo "                      Default : 0.05"
+    echo ""
+
+    echo "  -it                 Taxonomy levels"
+    echo "                      Default : phylum,genus,species"
+    echo ""
+
+    echo "  -if                 Functional levels"
+    echo "                      Default : metacyc,gene"
+    echo ""
+
+    echo "  --output            Output directory name"
+    echo "                      Default : Statistics"
+    echo ""
+
+    echo "  -c, --config        Config directory"
+    echo "                      Default :"
+    echo "                      /garnet2/Tools/Amplicon_MetaGenome/Adv_Analysis/Statistics_v2.0.0/config"
+    echo ""
+
+    echo "Unavailable Options in ReadBased mode:"
+    echo "  -ic                 Custom category option is not supported"
+    echo ""
+
+
+    echo "======================================================================"
+    echo ""
+
+ 
 }
-
-
 
 orderNumber=""
 metadata=""
@@ -89,11 +154,13 @@ while [ $# -gt 0 ]; do
             ;;
 
         -ic)
-            echo "invalid option ic: $1"
+            echo "######## invalid option ic: $1"
+            help
             exit 1 ### ASV 에는 Custom 없음
             ;;
         *)
             echo "Unknown option: $1"
+            help
             exit 1
             ;;
     esac
@@ -101,6 +168,8 @@ done
 
 [[ -z "$orderNumber" ]] && {
     echo "[ERROR] orderNumber is required option in Read Based pipeline"
+    echo
+    help
     exit 1
 }
 
@@ -108,9 +177,19 @@ done
 
 [[ -z "$metadata" ]] && {
     echo "[ERROR] metadata is required option in Read Based pipeline"
+    echo
+    help
     exit 1
 }
 
+
+if [[ ! " Kruskal Wilcoxon Wilcoxon_pair t_test paired_t anova " =~ " ${method} " ]]; then
+
+    echo "[ERROR] Invalid method: $method"
+    help
+    exit 1
+
+fi
 ## setting Dir / params
 source $config
 
@@ -216,7 +295,7 @@ function run_statistics(){
     read -ra script_arr <<< "$scripts"
     echo "${sPath}/${script_arr[0]}  processed.txt  ./metadata.txt "
     echo "${sPath}/${script_arr[1]} --dunn  ${dunnP} --desc mapping.txt --sheet ${output} --header $header --type ${type}"
-
+    echo " ${sPath}/${MakePlot}   ${method} "
 
     #for running
 
@@ -236,7 +315,7 @@ function run_statistics(){
     #Step3.  Statistics
     ${sPath}/${script_arr[0]}  processed.txt  ./metadata.txt 
     ${sPath}/${script_arr[1]} --dunn  ${dunnP} --desc mapping.txt --sheet ${output} --header $header --type ${type}
-
+    ${sPath}/${MakePlot}   ${method} 
     cd -
 }
 

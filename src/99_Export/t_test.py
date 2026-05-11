@@ -48,16 +48,16 @@ tt_cols = [
     "ttest.pvalue",
     "ttest.fdr",
     "ttest.fdr_2nd",
-    "ttest.CI_low",
-    "ttest.CI_high"
+    #"ttest.CI_low",
+    #"ttest.CI_high"
 ]
 
 tt_rename = {
     "ttest.pvalue": "p-value",
     "ttest.fdr": "FDR",
     "ttest.fdr_2nd": "FDR(2nd)",
-    "ttest.CI_low": "ttest.CI_Lower",
-    "ttest.CI_high": "ttest.CI_Upper"
+    #"ttest.CI_low": "ttest.CI_Lower",
+    #"ttest.CI_high": "ttest.CI_Upper"
 }
 
 tt2 = tt[tt_cols].rename(columns=tt_rename)
@@ -139,8 +139,8 @@ for g1, g2 in pairs:
 
 # Stats
 final_cols += [
-    "ttest.CI_Lower",
-    "ttest.CI_Upper",
+    #"ttest.CI_Lower",
+   # "ttest.CI_Upper",
     "p-value",
     "FDR",
     "FDR(2nd)"
@@ -174,11 +174,11 @@ for i, col in enumerate(df.columns):
 
         new_cols.append(("Taxonomy", "Taxonomy"))
 
-    elif "ttest.CI" in col:
+    #elif "ttest.CI" in col:
 
-        prefix, suffix = col.split("_", 1)
+    #    prefix, suffix = col.split("_", 1)
 
-        new_cols.append(("95% Confidence Interval", suffix))
+    #    new_cols.append(("95% Confidence Interval", suffix))
 
     elif "___" in col:
 

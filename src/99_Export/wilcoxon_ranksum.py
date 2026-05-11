@@ -164,7 +164,7 @@ with open("pvalue.columns","w") as fw:
 
 with open("final.output", "w") as f:
     f.write("[sheetname]\n%s\n"%(args.sheet))
-    f.write("[Title]\nWilcoxon ranksum tes\n")
+    f.write("[Title]\nWilcoxon Rank Sum Test (unpaired)\n")
     f.write(f"[SubTitle]\nmin value = {min_val:.6f}, ε={pseudo:.0e}\n")
 
     # header 1

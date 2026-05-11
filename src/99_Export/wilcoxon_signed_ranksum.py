@@ -235,7 +235,7 @@ styles+=["ws.column_dimensions[get_column_letter(7)].width = 25","ws.column_dime
 
 with open("final.output", "w") as f:
     f.write("[sheetname]\n%s\n"%(args.sheet))
-    f.write("[Title]\nWilcox Signed Rank Test\n")
+    f.write("[Title]\nWilcoxon Signed Rank Test (paired)\n")
     f.write(f"[SubTitle]\nmin value = {min_val:.6f}, ε={pseudo:.0e}\n")
 
     # header 1

@@ -48,21 +48,21 @@ fc2 = fc.rename(columns=fc_rename)
 
 tt_cols = [
     "taxa",
-    "paired_t.statistic",
-    "paired_t.mean_diff",
+    #"paired_t.statistic",
+    #"paired_t.mean_diff",
     "paired_t.pvalue",
     "paired_t.fdr",
-    "paired_t.fdr_2nd",
-    "n_pairs"
+    "paired_t.fdr_2nd"
+    #"n_pairs"
 ]
 
 tt_rename = {
-    "paired_t.statistic": "paired_t.statistic",
-    "paired_t.mean_diff": "paired_t.mean_diff",
+    #"paired_t.statistic": "paired_t.statistic",
+    #"paired_t.mean_diff": "paired_t.mean_diff",
     "paired_t.pvalue": "p-value",
     "paired_t.fdr": "FDR",
-    "paired_t.fdr_2nd": "FDR(2nd)",
-    "n_pairs": "n_pairs"
+    "paired_t.fdr_2nd": "FDR(2nd)"
+    #"n_pairs": "n_pairs"
 }
 
 tt2 = tt[tt_cols].rename(columns=tt_rename)
@@ -153,9 +153,9 @@ else:
 
 ## 최종 출력 컬럼 지정
 final_cols += [
-    "paired_t.statistic",
-    "paired_t.mean_diff",
-    "n_pairs",
+  #  "paired_t.statistic",
+   # "paired_t.mean_diff",
+   # "n_pairs",
     "p-value",
     "FDR",
     "FDR(2nd)"
@@ -250,13 +250,13 @@ for i, col in enumerate(result.columns):
 
         new_cols.append(("Log2(FoldChange)", col))
 
-    elif col in [
-        "paired_t.statistic",
-        "paired_t.mean_diff",
-        "n_pairs"
-    ]:
-
-        new_cols.append(("Paired t-test", col))
+    #elif col in [
+        #"paired_t.statistic",
+        #"paired_t.mean_diff",
+        #"n_pairs"
+    #]:
+#
+        #new_cols.append(("Paired t-test", col))
 
     elif col in ["p-value", "FDR", "FDR(2nd)"]:
 

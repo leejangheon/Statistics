@@ -58,7 +58,10 @@ for idx, taxa in enumerate(table.columns, start=1):
     # paired t-test 는 최소 2쌍 필요
     if len(v1) < 2:
         continue
-
+    diff = v1 - v2
+    if np.std(diff, ddof=1) == 0:
+        continue
+        
     # paired t-test
     stat, p = ttest_rel(v1, v2, nan_policy="omit")
 

@@ -1,12 +1,45 @@
 #!/bin/sh
 
  
-function help(){
-    echo -e "[[잘못된 옵션]]"
-    echo -e "sh $0  ASV|ReadBased|MAG|Custom|Norm"   
-        
-}
+function help() {
 
+    echo ""
+    echo "=============================================================="
+    echo "                    Statistical Analysis"
+    echo "=============================================================="
+    echo ""
+
+    echo "Usage:"
+    echo "  sh $0 <MODE> <METHOD>"
+    echo ""
+
+    echo "Available MODE:"
+    echo "  ASV          : ASV abundance table"
+    echo "  ReadBased    : Read-based taxonomy/profile"
+    echo "  MAG          : MAG-based analysis"
+    echo "  Custom       : User custom table"
+    echo "  Norm         : Normalized table"
+    echo ""
+
+    echo "Available METHOD:"
+    echo "  Kruskal          : Kruskal-Wallis test"
+    echo "  Wilcoxon         : Wilcoxon rank-sum test"
+    echo "  Wilcoxon_pair    : Paired Wilcoxon signed-rank test"
+    echo "  t_test           : Welch t-test"
+    echo "  paired_t         : Paired t-test"
+    echo "  anova            : One-way ANOVA + Tukey HSD"
+    echo ""
+
+    echo "Example:"
+    echo "  sh $0 ASV --method Kruskal"
+    echo "  sh $0 ReadBased --method  anova"
+    echo ""
+
+    echo "=============================================================="
+    echo ""
+
+    exit 1
+}
 
 
 # default setting 

@@ -7,43 +7,6 @@ from statsmodels.stats.multitest import multipletests
 import sys
 
 
-def mean_ci(v1, v2, alpha=0.05):
-
-    v1 = np.asarray(v1, dtype=float)
-    v2 = np.asarray(v2, dtype=float)
-
-    v1 = v1[~np.isnan(v1)]
-    v2 = v2[~np.isnan(v2)]
-
-    mean_diff = np.mean(v2) - np.mean(v1)
-
-    n1 = len(v1)
-    n2 = len(v2)
-
-    s1 = np.var(v1, ddof=1)
-    s2 = np.var(v2, ddof=1)
-
-    
-    se = np.sqrt((s1 / n1) + (s2 / n2))
-
-    
-    df = (
-        ((s1 / n1) + (s2 / n2)) ** 2
-    ) / (
-        ((s1 / n1) ** 2) / (n1 - 1)
-        + ((s2 / n2) ** 2) / (n2 - 1)
-    )
-
-    from scipy.stats import t
-
-    t_crit = t.ppf(1 - alpha / 2, df)
-
-    ci_low = mean_diff - (t_crit * se)
-    ci_high = mean_diff + (t_crit * se)
-
-    return ci_low, ci_high
-
-
 table = pd.read_csv(
     sys.argv[1],
     sep="\t",
@@ -103,14 +66,14 @@ for idx, taxa in enumerate(table.columns, start=1):
     )
 
     # mean difference + 95% CI
-    #mean_diff, ci_low, ci_high = mean_ci(v1, v2)
+
 
     row = {
         "taxa": taxa,
         "ttest.pvalue": p,
         #"ttest.mean_diff": mean_diff,
-        "ttest.CI_low": ci_low,
-        "ttest.CI_high": ci_high
+        #"ttest.CI_low": ci_low,
+        #"ttest.CI_high": ci_high
     }
 
     results.append(row)

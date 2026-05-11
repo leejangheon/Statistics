@@ -112,6 +112,14 @@ done
 }
 
 
+if [[ ! " Kruskal Wilcoxon Wilcoxon_pair t_test paired_t anova " =~ " ${method} " ]]; then
+
+    echo "[ERROR] Invalid method: $method"
+    help
+    exit 1
+
+fi
+
 echo ""
 echo "=================================================="
 echo "      Read based Statistics Pipeline Config"

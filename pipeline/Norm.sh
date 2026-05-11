@@ -3,13 +3,38 @@
 # 2026.04.29 요약 :  ASV -> 정규성 검사 X 
 
 ## 사용방법 
-function help(){
-    echo -e "sh $0  ASV|ReadBased|Custom"
-    echo -e " Kruskal | Wilcoxon | Wilcoxon_pair | anova | t_test | paired_t_test "
+function help() {
 
-    echo -e "\n\nTEST"
+    echo ""
+    echo "======================================================================"
+    echo "                     Normality Test Pipeline"
+    echo "======================================================================"
+    echo ""
+
+    echo "Usage:"
+    echo "  sh $0 [OPTIONS]"
+    echo ""
+
+    echo "Required Options:"
+    echo "  -m,  --metadata     Metadata file"
+    echo "  -ic                 Input abundance table"
+    echo ""
+
+    echo "Optional Options:"
+    echo "  -c, --config        Config directory"
+    echo "                      Default :"
+    echo "                      /garnet2/Tools/Amplicon_MetaGenome/Adv_Analysis/Statistics_v2.0.0/config"
+    echo ""
+
+    echo "Output:"
+    echo "  ./Normality"
+    echo ""
+
+    echo "======================================================================"
+    echo ""
+
+  
 }
-
 
 
 input=""
@@ -30,10 +55,28 @@ while [ $# -gt 0 ]; do
             ;;
         *)
             echo "Unknown option: $1"
+            help
             exit 1
             ;;
     esac
 done
+
+
+## 필수 옵션체크하기 !!! 
+[[ -z "$input" ]] && {
+    echo "[ERROR] input is required option in Normality pipeline"
+    echo
+    help
+    exit 1
+}
+
+
+[[ -z "$metadata" ]] && {
+    echo "[ERROR] metadata is required option in Normality pipeline"
+     echo
+    help
+    exit 1
+}
 
 
 ## setting Dir / params
@@ -42,6 +85,7 @@ source $config
 p_result=./Normality
 if [ -d "$p_result" ]; then
     echo "[ERROR] Directory already exists: $p_result" >&2
+    help
     exit 1
 fi
 mkdir -p ${p_result}

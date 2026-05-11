@@ -34,12 +34,13 @@ Wilcoxon="2_Statistics/wilcoxon_ranksum.py 99_Export/wilcoxon_ranksum.py"
 Wilcoxon_pair="2_Statistics/wilcoxon_signed_ranksum.py 99_Export/wilcoxon_signed_ranksum.py"
 
 
-t_test="2_Statistics/t_test.py"
-paired_t="2_Statistics/paired_t_test.py"
+t_test="2_Statistics/t_test.py 99_Export/t_test.py"
+paired_t="2_Statistics/paired_t_test.py 99_Export/paired_t_test.py"
 anova="2_Statistics/1way_annova.py 99_Export/1way_annova.py"
 
 
 
 MakeExcel=ZZ_Report/MakeExcel.py
 
-MergeExcel=ZZ_Report/MergeExcel.py
+MakePlot=3_boxplot/MakePlot.py
+
