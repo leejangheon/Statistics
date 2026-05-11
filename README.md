@@ -107,6 +107,7 @@ sh .../pipeline/Norm.sh -ic abundance.txt -m metadata.txt
 --------------------------------------------------------------------------------
 📂 결과 파일 구조
 분석이 완료되면 설정한 디렉토리(기본값: [analysis]_Statistics)에 다음과 같은 결과가 생성됩니다.
+```
 [analysis]_Statistics/
 ├── config                     # 실행된 분석 설정 파라미터 로그
 ├── metadata.txt               # 분석에 사용된 메타데이터 파일
@@ -117,3 +118,4 @@ sh .../pipeline/Norm.sh -ic abundance.txt -m metadata.txt
 │   ├── kruskal_dunn_summary.tsv (또는 ttest_summary 등)
 │   └── Log2FC.tsv
 └── output.xlsx                # 모든 통계 결과가 통합된 최종 엑셀 리포트
+```
