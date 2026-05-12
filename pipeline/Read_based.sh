@@ -53,10 +53,27 @@ function help() {
     echo "  -it                 Taxonomy levels"
     echo "                      Default : phylum,genus,species"
     echo ""
+    echo "                      Available:"
+    echo "                        phylum"
+    echo "                        class"
+    echo "                        order"
+    echo "                        family"
+    echo "                        genus"
+    echo "                        species"
+    echo ""
+
 
     echo "  -if                 Functional levels"
     echo "                      Default : metacyc,gene"
     echo ""
+    echo "                      Available:"
+    echo "                        metacyc"
+    echo "                        gene"
+    echo "                        kegg"
+    echo "                        eggnog"
+    echo ""
+
+
 
     echo "  --output            Output directory name"
     echo "                      Default : Statistics"
@@ -376,7 +393,11 @@ if [[ "${tax_level,,}" != "false" ]]; then
                 lists+=("it,${read_based}/${orderNumber}/result/MetaPhlAn4/taxonomy/MetaPhlAn4.Species.tsv,Species")
                 merged_sheet+=("${p_result}/Species")
                 ;;
-
+            *)
+                echo "Unknown option: $1"
+                help
+                exit 1
+                
         esac
     done
 fi
@@ -409,7 +430,11 @@ if [[ "${func_level,,}" != "false" ]]; then
                 lists+=("if,${read_based}/${orderNumber}/result/HUMAnN4//${orderNumber}_genefamilies.tsv,Gene")
                 merged_sheet+=("${p_result}/Gene")
                 ;;
-
+            *)
+                echo "Unknown option: $1"
+                help
+                exit 1
+                
 
         esac
     done

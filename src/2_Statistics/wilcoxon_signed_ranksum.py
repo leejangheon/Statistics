@@ -68,10 +68,11 @@ for idx, taxa in enumerate(table.columns, start=1):
     stat, p = wilcoxon(
             v1,
             v2,
-            alternative="two-sided",
-            correction=True,
-            method="approx"
+            alternative="two-sided"
+           # correction=True
+            #method="approx"
         )
+
 
 
     row = {

@@ -55,6 +55,14 @@ function help() {
     echo "  -it                 Taxonomy levels"
     echo "                      Default : phylum,genus,species"
     echo ""
+    echo "                      Available:"
+    echo "                        phylum"
+    echo "                        class"
+    echo "                        order"
+    echo "                        family"
+    echo "                        genus"
+    echo "                        species"
+    echo ""
 
     echo "  --output            Output directory name"
     echo "                      Default : Statistics"
@@ -404,7 +412,11 @@ if [[ "${tax_level,,}" != "false" ]]; then
                 lists+=("it,${asv}/${orderNumber}/${analysis}/Taxonomy_Assignment/${db_selected}/ASVs_${db_selected}.biom.summary/ASVs_${db_selected}_L7.txt,Species")
                 merged_sheet+=("${p_result}/Species")
                 ;;
-
+            *)
+                echo "Unknown option: $1"
+                help
+                exit 1
+                ;;
         esac
     done
 fi
