@@ -413,7 +413,7 @@ if [[ "${tax_level,,}" != "false" ]]; then
                 merged_sheet+=("${p_result}/Species")
                 ;;
             *)
-                echo "Unknown option: $1"
+                echo "Unknown taxonomy"
                 help
                 exit 1
                 ;;
